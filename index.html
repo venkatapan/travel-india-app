@@ -61,6 +61,15 @@
 }
 </script>
   <script type="module" crossorigin src="assets/index-CzpkXazj.js"></script>
+  <script>
+fetch("https://www.pakkahouse.in/wp-json/wp/v2/posts?per_page=5")
+  .then(r => r.json())
+  .then(posts => {
+    console.log("WP Posts:", posts);
+  })
+  .catch(err => console.error(err));
+</script>
+
 </head>
 <body class="bg-white text-gray-900 selection:bg-blue-100 selection:text-blue-700">
   <div id="root"></div>
