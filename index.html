@@ -61,6 +61,64 @@
 }
 </script>
   <script type="module" crossorigin src="assets/index-CzpkXazj.js"></script>
+
+  <script>
+const POSTS_API = "https://www.pakkahouse.in/wp-json/wp/v2/posts?per_page=6&_embed";
+const CATS_API  = "https://www.pakkahouse.in/wp-json/wp/v2/categories?per_page=100";
+
+let categoriesMap = {};
+
+async function loadCategories() {
+  const res = await fetch(CATS_API);
+  const cats = await res.json();
+  cats.forEach(cat => {
+    categoriesMap[cat.id] = cat.name;
+  });
+}
+
+async function loadPosts() {
+  const res = await fetch(POSTS_API);
+  const posts = await res.json();
+
+  const container = document.getElementById("posts");
+  container.innerHTML = "";
+
+  posts.forEach(post => {
+    const img =
+      post._embedded?.["wp:featuredmedia"]?.[0]?.source_url || "";
+
+    const cats = post.categories
+      .map(id => categoriesMap[id])
+      .filter(Boolean)
+      .map(
+        name =>
+          `<span class="bg-green-600 text-white text-xs px-2 py-1 rounded">${name}</span>`
+      )
+      .join(" ");
+
+    container.innerHTML += `
+      <article class="bg-white rounded-xl shadow p-4 grid md:grid-cols-3 gap-4">
+        <img src="${img}" class="w-full h-48 object-cover rounded" />
+        <div class="md:col-span-2 space-y-2">
+          <h2 class="text-xl font-bold">${post.title.rendered}</h2>
+          <div class="flex flex-wrap gap-2">${cats}</div>
+          <p class="text-gray-600">${post.excerpt.rendered.replace(/<[^>]+>/g,'')}</p>
+          <a href="${post.link}" target="_blank"
+             class="text-blue-600 font-semibold inline-block mt-2">
+             Read More →
+          </a>
+        </div>
+      </article>
+    `;
+  });
+}
+
+(async function init() {
+  await loadCategories();
+  await loadPosts();
+})();
+</script>
+
  
 </head>
 <body class="bg-white text-gray-900 selection:bg-blue-100 selection:text-blue-700">
